@@ -1973,6 +1973,27 @@ console.log('[MediStore] Block 4 loaded · helpers + batch/FEFO core ready');
    BLOCK 5 — DATA SYNC + AUTH + SETTINGS SAVE
    ══════════════════════════════════════════════════════════════════ */
 
+     /* ─────────────────────────────────────────────
+   0. PAGINATED FETCH — invoice_items
+   Bypasses Supabase's 1000-row default cap
+   ───────────────────────────────────────────── */
+async function fetchAllInvoiceItems(){
+  const PAGE = 1000;
+  const out  = [];
+  let from = 0;
+  for(let safety = 0; safety < 200; safety++){   /* hard cap ~200k rows */
+    const { data, error } = await sb.from('invoice_items')
+      .select('*')
+      .range(from, from + PAGE - 1);
+    if(error){ console.error('[fetchAllInvoiceItems]', error); break; }
+    if(!data || !data.length) break;
+    out.push(...data);
+    if(data.length < PAGE) break;
+    from += data.length;   /* advance by actual returned count (bulletproof) */
+  }
+  return out;
+}
+
 /* ─────────────────────────────────────────────
    1. FETCH ALL TABLES (parallel + retry)
    ───────────────────────────────────────────── */
@@ -1986,7 +2007,6 @@ async function syncDB(){
     products:               () => sb.from('products').select('*').order('name'),
     product_batches:        () => sb.from('product_batches').select('*').order('expiry_date'),
     invoices:               () => sb.from('invoices').select('*').order('invoice_date', { ascending:false }),
-    invoice_items:          () => sb.from('invoice_items').select('*'),
     payments:               () => sb.from('payments').select('*').order('payment_date', { ascending:false }),
     supplier_invoices:      () => sb.from('supplier_invoices').select('*').order('bill_date', { ascending:false }),
     supplier_invoice_items: () => sb.from('supplier_invoice_items').select('*'),
@@ -2030,6 +2050,14 @@ async function syncDB(){
     }
   });
 
+/* ── Invoice items: paginated load (no 1000-row cap) ── */
+  try {
+    DB.invoice_items = await fetchAllInvoiceItems();
+  } catch(e){
+    errors.push('invoice_items - ' + (e.message || e));
+  }
+
+     
   /* ── Settings (single row id=1) ── */
   try{
     const sett = await sb.from('settings').select('*').eq('id', 1).maybeSingle();

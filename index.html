@@ -11975,29 +11975,37 @@ if(SETTINGS.dl_number){ doc.text('DL No: ' + SETTINGS.dl_number, textX, ty); ty 
     const custName = inv.customer_name || (party && party.name) || 'Walk-in';
     const custPhone= inv.customer_phone || (party && party.phone) || '';
 
-    /* Meta */
+        /* Meta */
     doc.setFontSize(10);
     doc.setTextColor(0, 0, 0);
     doc.setFont('helvetica', 'bold');
-    doc.text('Invoice No:', 14, y);
-    doc.text('Date:',       14, y + 5);
-    doc.text('Customer:',   14, y + 10);
-    if(custPhone) doc.text('Phone:', 14, y + 15);
-    if(inv.doctor_name)    doc.text('Doctor:',  14, y + 20);
-    if(inv.patient_name)   doc.text('Patient:', 14, y + 25);
-    if(inv.prescription_no)doc.text('Rx No:',   14, y + 30);
+    
+    let metaY = y;
+    
+    doc.text('Invoice No:', 14, metaY);
+    doc.text('Date:',       14, metaY + 5);
+    doc.text('Customer:',   14, metaY + 10);
+    metaY += 10;
+    
+    if(custPhone) { metaY += 5; doc.text('Phone:', 14, metaY); }
+    if(inv.doctor_name) { metaY += 5; doc.text('Doctor:', 14, metaY); }
+    if(inv.patient_name) { metaY += 5; doc.text('Patient:', 14, metaY); }
+    if(inv.prescription_no) { metaY += 5; doc.text('Rx No:', 14, metaY); }
 
     doc.setFont('helvetica', 'normal');
-    doc.text(clean(inv.invoice_no || ''), 45, y);
-    doc.text(clean(fmtDate(txDate(inv, 'invoice_date'))), 45, y + 5);
-    doc.text(clean(custName), 45, y + 10);
-    if(custPhone) doc.text(clean(custPhone), 45, y + 15);
-    if(inv.doctor_name)    doc.text(clean(inv.doctor_name), 45, y + 20);
-    if(inv.patient_name)   doc.text(clean(inv.patient_name), 45, y + 25);
-    if(inv.prescription_no)doc.text(clean(inv.prescription_no), 45, y + 30);
+    let valY = y;
+    doc.text(clean(inv.invoice_no || ''), 45, valY);
+    doc.text(clean(fmtDate(txDate(inv, 'invoice_date'))), 45, valY + 5);
+    doc.text(clean(custName), 45, valY + 10);
+    valY += 10;
+    
+    if(custPhone) { valY += 5; doc.text(clean(custPhone), 45, valY); }
+    if(inv.doctor_name) { valY += 5; doc.text(clean(inv.doctor_name), 45, valY); }
+    if(inv.patient_name) { valY += 5; doc.text(clean(inv.patient_name), 45, valY); }
+    if(inv.prescription_no) { valY += 5; doc.text(clean(inv.prescription_no), 45, valY); }
 
     /* Items table */
-    const startY = y + (inv.customer_phone ? 40 : 20);
+    const startY = metaY + 10;
     const body = items.map(it => [
       clean(it.product_name || ''),
       clean(it.batch_no || '—'),

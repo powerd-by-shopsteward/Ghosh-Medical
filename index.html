@@ -7883,7 +7883,8 @@ function buildThermalReceiptText(inv, items, party){
   if(SETTINGS.city)       t += SETTINGS.city + '\n';
   if(SETTINGS.phone)      t += 'Ph: ' + SETTINGS.phone + '\n';
   if(SETTINGS.gst_enabled && SETTINGS.gst_number) t += 'GSTIN: ' + SETTINGS.gst_number + '\n';
-  if(SETTINGS.dl_number)  t += 'DL: ' + SETTINGS.dl_number + '\n';
+  if(SETTINGS.license)    t += 'DL No: ' + SETTINGS.license + '\n';
+if(SETTINGS.dl_number)  t += 'DL: ' + SETTINGS.dl_number + '\n';
   t += divider + '\n';
 
   /* Invoice + customer */
@@ -7986,7 +7987,8 @@ function buildThermalReceiptHTML(inv, items, party){
         ${SETTINGS.city ? `<div>${esc(SETTINGS.city)}</div>` : ''}
         ${SETTINGS.phone ? `<div>Ph: ${esc(SETTINGS.phone)}</div>` : ''}
         ${SETTINGS.gst_enabled && SETTINGS.gst_number ? `<div>GSTIN: ${esc(SETTINGS.gst_number)}</div>` : ''}
-        ${SETTINGS.dl_number ? `<div>DL: ${esc(SETTINGS.dl_number)}</div>` : ''}
+        ${SETTINGS.license ? `<div>DL No: ${esc(SETTINGS.license)}</div>` : ''}
+${SETTINGS.dl_number ? `<div>DL: ${esc(SETTINGS.dl_number)}</div>` : ''}
       </div>
       <div style="border-top:1px dashed #000;margin:4px 0"></div>
       <div style="display:flex;justify-content:space-between"><span>Bill: ${esc(inv.invoice_no || '')}</span><span>${fmtDate(txDate(inv, 'invoice_date'))}</span></div>
@@ -8026,7 +8028,8 @@ function sendInvoiceWhatsAppText(inv, items, phone){
   if(SETTINGS.address) msg += SETTINGS.address + '\n';
   if(SETTINGS.phone)   msg += 'Ph: ' + SETTINGS.phone + '\n';
   if(SETTINGS.gst_enabled && SETTINGS.gst_number) msg += 'GSTIN: ' + SETTINGS.gst_number + '\n';
-  if(SETTINGS.dl_number) msg += 'DL No: ' + SETTINGS.dl_number + '\n';
+  if(SETTINGS.license)   msg += 'Drug Lic No: ' + SETTINGS.license + '\n';
+if(SETTINGS.dl_number) msg += 'DL No: ' + SETTINGS.dl_number + '\n';
   msg += '\n';
 
   msg += '*' + (inv.invoice_no || 'INVOICE') + '*\n';
@@ -8096,9 +8099,12 @@ async function sendInvoiceWhatsAppPDF(inv, items, phone){
   if(SETTINGS.gst_enabled && SETTINGS.gst_number){
     doc.text('GSTIN: ' + SETTINGS.gst_number, 14, hy); hy += 4;
   }
-  if(SETTINGS.dl_number){
+  if(SETTINGS.license){
+    doc.text('Drug Lic No: ' + SETTINGS.license, 14, hy); hy += 4;
+}
+if(SETTINGS.dl_number){
     doc.text('DL No: ' + SETTINGS.dl_number, 14, hy); hy += 4;
-  }
+}
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
@@ -10939,7 +10945,7 @@ function renderMyShop(content){
             <input class="input" name="license" value="${esc(SETTINGS.license || '')}" placeholder="e.g. 20B/21B-XXXXX">
           </div>
           <div>
-            <label class="label">DL Number (print header)</label>
+            <label class="label">DL Number 2 (print header)</label>
             <input class="input" name="dl_number" value="${esc(SETTINGS.dl_number || '')}" placeholder="e.g. 20B/21B-12345">
           </div>
         </div>
@@ -11580,7 +11586,8 @@ window.LocalPrinter = (function(){
       (SETTINGS.owner_name ? '<div>' + esc(SETTINGS.owner_name) + '</div>' : '') +
       (SETTINGS.address ? '<div>' + esc(SETTINGS.address) + '</div>' : '') +
       (SETTINGS.phone ? '<div>Ph: ' + esc(SETTINGS.phone) + '</div>' : '') +
-      (SETTINGS.dl_number ? '<div>DL: ' + esc(SETTINGS.dl_number) + '</div>' : '') +
+      (SETTINGS.license ? '<div>DL No: ' + esc(SETTINGS.license) + '</div>' : '') +
+(SETTINGS.dl_number ? '<div>DL: ' + esc(SETTINGS.dl_number) + '</div>' : '') +
       '<div style="border-top:1px dashed #000;margin:6px 0"></div>' +
       '<div style="text-align:center;font-weight:700">PRINTER TEST</div>' +
       '<div style="border-top:1px dashed #000;margin:6px 0"></div>' +
@@ -11922,7 +11929,8 @@ window.PDFMaker = (function(){
     if(SETTINGS.gst_enabled && SETTINGS.gst_number){
       doc.text('GSTIN: ' + clean(SETTINGS.gst_number), textX, ty); ty += 4;
     }
-    if(SETTINGS.dl_number){ doc.text('DL No: ' + clean(SETTINGS.dl_number), textX, ty); ty += 4; }
+    if(SETTINGS.license){ doc.text('Drug Lic No: ' + SETTINGS.license, textX, ty); ty += 4; }
+if(SETTINGS.dl_number){ doc.text('DL No: ' + SETTINGS.dl_number, textX, ty); ty += 4; }
 
     const lineY = Math.max(y + 20, ty + 2);
     doc.setDrawColor(200);
